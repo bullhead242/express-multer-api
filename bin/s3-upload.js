@@ -30,12 +30,32 @@ const parseFile = (fileBuffer) => {
   return file;
 };
 
-const logMessage = (file) => {
-  console.log(`${filename} is ${file.data.length} bytes long and is of mime ${file.mime}`);
+const upload = (file) => {
+  const options = {
+    // get bucket name from AWS s3 console
+    Bucket:'ps.bucket.10.2016',
+    // attch fileBuffer as a stream to send to AWS
+    Body: file.data,
+    // give public access to read URL of uploaded file
+    ACL: 'public-read',
+    // send mime type of uploaded file
+    ContentType: file.mime,
+    // pick filename for AWS to use for uploaded file
+    Key: `test/test.${file.ext}`
+  };
+  // continue to pass data along Promise chain
+  return Promise.resolve(options);
+};
+
+const logMessage = (upload) => {
+  // temporarily delete stream to log options in terminal without stream
+  delete upload.Body;
+  console.log(`upload options are ${JSON.stringify(upload)}`);
 };
 
 readFile(filename)
 .then(parseFile)
+.then(upload)
 .then(logMessage)
 .catch(console.error)
 ;
